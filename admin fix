@@ -1,0 +1,500 @@
+-- File: falz_admin_panel.lua
+-- Executor: Synapse X / Script-Ware
+-- Replica dari AdminFrame source + screenshot
+-- Username: falzieeeee
+
+local RS = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local LP = Players.LocalPlayer
+
+-- =====================
+-- SPOOF ADMINLIST
+-- =====================
+pcall(function()
+    local AL = require(RS:WaitForChild("Admin"):WaitForChild("AdminList"))
+    if not table.find(AL, "falzieeeee") then
+        table.insert(AL, "falzieeeee")
+    end
+    AL.IsAdmin = function(p)
+        return p and p.Name and p.Name:lower() == "falzieeeee"
+    end
+end)
+
+-- =====================
+-- GRAB REMOTE
+-- =====================
+local AdminCommandEvent
+pcall(function()
+    AdminCommandEvent = RS:WaitForChild("ADMIN")
+        :WaitForChild("RemoteEvents")
+        :WaitForChild("AdminCommandEvent")
+end)
+
+local function FireCommand(cmd)
+    cmd = cmd:match("^%s*(.-)%s*$")
+    if not cmd or #cmd == 0 then return end
+    if AdminCommandEvent then
+        pcall(function() AdminCommandEvent:FireServer(cmd) end)
+    end
+    print("[Falz] Fired: " .. cmd)
+end
+
+-- =====================
+-- DESTROY OLD
+-- =====================
+pcall(function()
+    if game.CoreGui:FindFirstChild("FalzAdminPanel") then
+        game.CoreGui.FalzAdminPanel:Destroy()
+    end
+end)
+
+-- =====================
+-- COMMAND DATA — dari source AdminCommands
+-- =====================
+local CATEGORIES = {
+    {
+        name = "Chat",
+        cmds = {
+            { name = "/message",   arg = "text",              emoji = "💬" },
+            { name = "/poll",      arg = "[seconds,] X OR Y", emoji = "📊" },
+            { name = "/ask",       arg = "[seconds,] question",emoji = "❤" },
+            { name = "/messages",  arg = "",                  emoji = "📨" },
+            { name = "/hackers",   arg = "",                  emoji = "🚨" },
+        }
+    },
+    {
+        name = "Boosts",
+        cmds = {
+            { name = "/x2cash",   arg = "minutes",            emoji = "💵" },
+            { name = "/x2luck",   arg = "minutes",            emoji = "🍀" },
+            { name = "/givecash", arg = "amount",             emoji = "💱" },
+            { name = "/gravity",  arg = "on / off",           emoji = "🪂" },
+        }
+    },
+    {
+        name = "World",
+        cmds = {
+            { name = "/event",      arg = "name",             emoji = "🎉" },
+            { name = "/clearevent", arg = "",                 emoji = "🗹"  },
+            { name = "/weather",    arg = "name",             emoji = "🌦"  },
+            { name = "/night",      arg = "",                 emoji = "🌙" },
+        }
+    },
+    {
+        name = "Spawning",
+        cmds = {
+            { name = "/spawnegg",   arg = "egg or rarity",    emoji = "🐣" },
+            { name = "/spawnsome",  arg = "percent egg",      emoji = "🎲" },
+            { name = "/spawnloop",  arg = "egg or rarity",    emoji = "🔁" },
+            { name = "/stoploop",   arg = "",                 emoji = "⏹"  },
+            { name = "/spawn3",     arg = "egg or rarity",    emoji = "3⃣" },
+            { name = "/tunnel",     arg = "",                 emoji = "🚇" },
+            { name = "/tunnelegg",  arg = "egg or rarity",    emoji = "🕳"  },
+            { name = "/tunnelloop", arg = "egg or rarity",    emoji = "🔄" },
+        }
+    },
+    {
+        name = "Field",
+        cmds = {
+            { name = "/randommutation",  arg = "",            emoji = "🎲" },
+            { name = "/upgrademutation", arg = "",            emoji = "⬆"  },
+            { name = "/allinverted",     arg = "",            emoji = "🙃" },
+            { name = "/allhacked",       arg = "",            emoji = "💻" },
+            { name = "/chaos",           arg = "seconds",     emoji = "🌀" },
+            { name = "/reveal",          arg = "seconds",     emoji = "🔍" },
+            { name = "/glitchmutations", arg = "seconds",     emoji = "🌈" },
+            { name = "/glitchrarity",    arg = "seconds",     emoji = "❤"  },
+            { name = "/glitchprices",    arg = "seconds",     emoji = "🤑" },
+            { name = "/teleporteggs",    arg = "seconds",     emoji = "🌀" },
+        }
+    },
+    {
+        name = "Prices",
+        cmds = {
+            { name = "/halfprice",  arg = "",                 emoji = "🏷"  },
+            { name = "/free30",     arg = "seconds",          emoji = "🏷"  },
+            { name = "/freeall",    arg = "",                 emoji = "🏷"  },
+        }
+    },
+    {
+        name = "Entities",
+        cmds = {
+            { name = "/sharks",  arg = "amount",              emoji = "🦈" },
+            { name = "/spiders", arg = "amount",              emoji = "🕷"  },
+            { name = "/ufos",    arg = "amount",              emoji = "🛸" },
+        }
+    },
+    {
+        name = "Events",
+        cmds = {
+            { name = "/bloodmoon",    arg = "", emoji = "🩸" },
+            { name = "/underwater",   arg = "", emoji = "🌊" },
+            { name = "/danceparty",   arg = "", emoji = "🕺" },
+            { name = "/acidrain",     arg = "", emoji = "🧪" },
+            { name = "/thunderstorm", arg = "", emoji = "⛈"  },
+            { name = "/meteorshower", arg = "", emoji = "☄"  },
+            { name = "/solareclipse", arg = "", emoji = "🌑" },
+            { name = "/tornado",      arg = "", emoji = "🌪"  },
+            { name = "/volcano",      arg = "", emoji = "🌋" },
+            { name = "/glitch",       arg = "", emoji = "🤑" },
+            { name = "/lightspeed",   arg = "", emoji = "💫" },
+            { name = "/blackhole",    arg = "", emoji = "🕳"  },
+            { name = "/galaxy",       arg = "", emoji = "🌌" },
+        }
+    },
+    {
+        name = "Hatches",
+        cmds = {
+            { name = "/hatchgoal",   arg = "hatches e.g. 2.5m", emoji = "🐣" },
+            { name = "/hatchset",    arg = "hatches e.g. 10m",  emoji = "🎯" },
+            { name = "/hatchstats",  arg = "",                  emoji = "📊" },
+            { name = "/progressbar", arg = "show / hide",       emoji = "👁"  },
+        }
+    },
+}
+
+-- =====================
+-- GUI BUILD
+-- =====================
+local gui = Instance.new("ScreenGui", game.CoreGui)
+gui.Name = "FalzAdminPanel"
+gui.ResetOnSpawn = false
+gui.DisplayOrder = 999
+
+-- main frame — style dari screenshot Mr. Egg's Panel
+local main = Instance.new("Frame", gui)
+main.Name = "AdminFrame"
+main.Size = UDim2.new(0, 500, 0, 540)
+main.Position = UDim2.new(0.5, -250, 0.5, -270)
+main.BackgroundColor3 = Color3.fromRGB(30, 30, 38)
+main.BorderSizePixel = 0
+main.Active = true
+main.Draggable = true
+Instance.new("UICorner", main).CornerRadius = UDim.new(0, 8)
+local ms = Instance.new("UIStroke", main)
+ms.Color = Color3.fromRGB(60, 60, 80)
+ms.Thickness = 1
+
+-- header — putih kayak di screenshot
+local hdr = Instance.new("Frame", main)
+hdr.Size = UDim2.new(1, 0, 0, 44)
+hdr.BackgroundColor3 = Color3.fromRGB(240, 240, 245)
+hdr.BorderSizePixel = 0
+Instance.new("UICorner", hdr).CornerRadius = UDim.new(0, 8)
+local hfix = Instance.new("Frame", hdr)
+hfix.Size = UDim2.new(1, 0, 0.5, 0)
+hfix.Position = UDim2.new(0, 0, 0.5, 0)
+hfix.BackgroundColor3 = Color3.fromRGB(240, 240, 245)
+hfix.BorderSizePixel = 0
+
+-- egg icon placeholder
+local eggIcon = Instance.new("TextLabel", hdr)
+eggIcon.Size = UDim2.new(0, 36, 0, 36)
+eggIcon.Position = UDim2.new(0, 6, 0.5, -18)
+eggIcon.BackgroundColor3 = Color3.fromRGB(100, 180, 255)
+eggIcon.Text = "🥚"
+eggIcon.TextSize = 20
+eggIcon.Font = Enum.Font.GothamMedium
+eggIcon.TextColor3 = Color3.new(1,1,1)
+eggIcon.BorderSizePixel = 0
+Instance.new("UICorner", eggIcon).CornerRadius = UDim.new(0, 6)
+
+local htitle = Instance.new("TextLabel", hdr)
+htitle.Size = UDim2.new(1, -100, 1, 0)
+htitle.Position = UDim2.new(0, 48, 0, 0)
+htitle.BackgroundTransparency = 1
+htitle.Text = "Mr. Egg's Panel"
+htitle.TextColor3 = Color3.fromRGB(30, 30, 40)
+htitle.TextSize = 16
+htitle.Font = Enum.Font.GothamMedium
+htitle.TextXAlignment = Enum.TextXAlignment.Left
+
+-- close button — merah kayak screenshot
+local xbtn = Instance.new("TextButton", hdr)
+xbtn.Size = UDim2.new(0, 32, 0, 32)
+xbtn.Position = UDim2.new(1, -38, 0.5, -16)
+xbtn.BackgroundColor3 = Color3.fromRGB(220, 50, 50)
+xbtn.Text = "X"
+xbtn.TextColor3 = Color3.new(1,1,1)
+xbtn.TextSize = 14
+xbtn.Font = Enum.Font.GothamMedium
+xbtn.BorderSizePixel = 0
+Instance.new("UICorner", xbtn).CornerRadius = UDim.new(0, 6)
+xbtn.Activated:Connect(function() main.Visible = false end)
+
+-- command input bar — kayak screenshot
+local cmdBg = Instance.new("Frame", main)
+cmdBg.Size = UDim2.new(1, -16, 0, 36)
+cmdBg.Position = UDim2.new(0, 8, 0, 50)
+cmdBg.BackgroundColor3 = Color3.fromRGB(240, 240, 245)
+cmdBg.BorderSizePixel = 0
+Instance.new("UICorner", cmdBg).CornerRadius = UDim.new(0, 6)
+
+local cmdBox = Instance.new("TextBox", cmdBg)
+cmdBox.Name = "TextBox"
+cmdBox.Size = UDim2.new(1, -10, 1, 0)
+cmdBox.Position = UDim2.new(0, 8, 0, 0)
+cmdBox.BackgroundTransparency = 1
+cmdBox.TextColor3 = Color3.fromRGB(30, 30, 40)
+cmdBox.PlaceholderText = "/spawnegg Legendary"
+cmdBox.PlaceholderColor3 = Color3.fromRGB(160, 160, 180)
+cmdBox.Text = ""
+cmdBox.TextSize = 13
+cmdBox.Font = Enum.Font.Code
+cmdBox.ClearTextOnFocus = false
+cmdBox.TextXAlignment = Enum.TextXAlignment.Left
+
+-- enter button
+local enterBtn = Instance.new("TextButton", main)
+enterBtn.Name = "Enter"
+enterBtn.Size = UDim2.new(0, 70, 0, 30)
+enterBtn.Position = UDim2.new(1, -78, 0, 55)
+enterBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 60)
+enterBtn.Text = "Enter"
+enterBtn.TextColor3 = Color3.new(1,1,1)
+enterBtn.TextSize = 12
+enterBtn.Font = Enum.Font.GothamMedium
+enterBtn.BorderSizePixel = 0
+Instance.new("UICorner", enterBtn).CornerRadius = UDim.new(0, 6)
+
+local function submitCmd()
+    local cmd = cmdBox.Text:match("^%s*(.-)%s*$")
+    if cmd and #cmd > 0 then
+        FireCommand(cmd)
+        cmdBox.Text = ""
+    end
+end
+enterBtn.Activated:Connect(submitCmd)
+cmdBox.FocusLost:Connect(function(enter)
+    if enter then submitCmd() end
+end)
+
+-- category tabs
+local tabContainer = Instance.new("Frame", main)
+tabContainer.Size = UDim2.new(1, -16, 0, 32)
+tabContainer.Position = UDim2.new(0, 8, 0, 92)
+tabContainer.BackgroundTransparency = 1
+tabContainer.ClipsDescendants = true
+
+local tabScroll = Instance.new("ScrollingFrame", tabContainer)
+tabScroll.Size = UDim2.new(1, 0, 1, 0)
+tabScroll.BackgroundTransparency = 1
+tabScroll.ScrollBarThickness = 0
+tabScroll.ScrollingDirection = Enum.ScrollingDirection.X
+tabScroll.AutomaticCanvasSize = Enum.AutomaticSize.X
+tabScroll.CanvasSize = UDim2.new(0,0,0,0)
+tabScroll.BorderSizePixel = 0
+
+local tabLayout = Instance.new("UIListLayout", tabScroll)
+tabLayout.FillDirection = Enum.FillDirection.Horizontal
+tabLayout.SortOrder = Enum.SortOrder.LayoutOrder
+tabLayout.Padding = UDim.new(0, 4)
+
+-- command scroll
+local cmdScroll = Instance.new("ScrollingFrame", main)
+cmdScroll.Size = UDim2.new(1, -16, 1, -180)
+cmdScroll.Position = UDim2.new(0, 8, 0, 130)
+cmdScroll.BackgroundTransparency = 1
+cmdScroll.ScrollBarThickness = 4
+cmdScroll.ScrollBarImageColor3 = Color3.fromRGB(80, 80, 120)
+cmdScroll.BorderSizePixel = 0
+cmdScroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
+cmdScroll.CanvasSize = UDim2.new(0,0,0,0)
+cmdScroll.ClipsDescendants = true
+
+local cmdLayout = Instance.new("UIListLayout", cmdScroll)
+cmdLayout.SortOrder = Enum.SortOrder.LayoutOrder
+cmdLayout.Padding = UDim.new(0, 2)
+
+-- speaker selector — dari source
+local speakerFrame = Instance.new("Frame", main)
+speakerFrame.Name = "Speakers"
+speakerFrame.Size = UDim2.new(0, 120, 0, 36)
+speakerFrame.Position = UDim2.new(1, -128, 1, -44)
+speakerFrame.BackgroundTransparency = 1
+
+local speakerLayout = Instance.new("UIListLayout", speakerFrame)
+speakerLayout.FillDirection = Enum.FillDirection.Horizontal
+speakerLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
+speakerLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+speakerLayout.Padding = UDim.new(0, 6)
+
+local SPEAKERS = {
+    { key = "MrEgg",  label = "🥚", color = Color3.fromRGB(255, 200, 50) },
+    { key = "Hacker", label = "💻", color = Color3.fromRGB(0, 255, 0)    },
+}
+local currentSpeaker = "MrEgg"
+local speakerBtns = {}
+
+for _, spk in ipairs(SPEAKERS) do
+    local sb = Instance.new("TextButton", speakerFrame)
+    sb.Size = UDim2.new(0, 36, 0, 36)
+    sb.BackgroundColor3 = Color3.fromRGB(30, 30, 38)
+    sb.Text = spk.label
+    sb.TextSize = 18
+    sb.Font = Enum.Font.GothamMedium
+    sb.BorderSizePixel = 0
+    sb.BackgroundTransparency = currentSpeaker == spk.key and 0 or 0.6
+    Instance.new("UICorner", sb).CornerRadius = UDim.new(0, 6)
+    local sbs = Instance.new("UIStroke", sb)
+    sbs.Color = Color3.fromRGB(0, 255, 0)
+    sbs.Thickness = 2
+    sbs.Enabled = currentSpeaker == spk.key
+    speakerBtns[spk.key] = { btn = sb, stroke = sbs }
+    sb.Activated:Connect(function()
+        currentSpeaker = spk.key
+        for k, v in pairs(speakerBtns) do
+            local sel = k == currentSpeaker
+            v.btn.BackgroundTransparency = sel and 0 or 0.6
+            v.stroke.Enabled = sel
+        end
+    end)
+end
+
+-- =====================
+-- BUILD TABS + COMMANDS
+-- =====================
+local activeTab = nil
+local tabBtns = {}
+local cmdRows = {}
+
+local function showCategory(catName)
+    activeTab = catName
+    for name, btn in pairs(tabBtns) do
+        local sel = name == catName
+        btn.BackgroundColor3 = sel
+            and Color3.fromRGB(60, 60, 90)
+            or  Color3.fromRGB(35, 35, 50)
+        btn.TextColor3 = sel
+            and Color3.fromRGB(255, 255, 255)
+            or  Color3.fromRGB(160, 160, 190)
+    end
+    for _, row in ipairs(cmdScroll:GetChildren()) do
+        if row:IsA("Frame") then row:Destroy() end
+    end
+    for _, cat in ipairs(CATEGORIES) do
+        if cat.name ~= catName then continue end
+        for i, cmd in ipairs(cat.cmds) do
+            local row = Instance.new("Frame", cmdScroll)
+            row.Name = "Row_" .. i
+            row.Size = UDim2.new(1, 0, 0, 38)
+            row.BackgroundColor3 = i % 2 == 0
+                and Color3.fromRGB(38, 38, 50)
+                or  Color3.fromRGB(32, 32, 44)
+            row.BorderSizePixel = 0
+            row.LayoutOrder = i
+            Instance.new("UICorner", row).CornerRadius = UDim.new(0, 6)
+
+            -- emoji
+            local emojiLbl = Instance.new("TextLabel", row)
+            emojiLbl.Size = UDim2.new(0, 32, 1, 0)
+            emojiLbl.Position = UDim2.new(0, 4, 0, 0)
+            emojiLbl.BackgroundTransparency = 1
+            emojiLbl.Text = cmd.emoji
+            emojiLbl.TextSize = 16
+            emojiLbl.Font = Enum.Font.GothamMedium
+
+            -- command name
+            local nameLbl = Instance.new("TextLabel", row)
+            nameLbl.Size = UDim2.new(0, 160, 1, 0)
+            nameLbl.Position = UDim2.new(0, 38, 0, 0)
+            nameLbl.BackgroundTransparency = 1
+            nameLbl.Text = cmd.name
+            nameLbl.TextColor3 = Color3.fromRGB(170, 255, 0)
+            nameLbl.TextSize = 13
+            nameLbl.Font = Enum.Font.Code
+            nameLbl.TextXAlignment = Enum.TextXAlignment.Left
+
+            -- arg input
+            local argBg = Instance.new("Frame", row)
+            argBg.Size = UDim2.new(0, 160, 0, 26)
+            argBg.Position = UDim2.new(0, 200, 0.5, -13)
+            argBg.BackgroundColor3 = Color3.fromRGB(22, 22, 32)
+            argBg.BorderSizePixel = 0
+            Instance.new("UICorner", argBg).CornerRadius = UDim.new(0, 5)
+
+            local argBox = Instance.new("TextBox", argBg)
+            argBox.Size = UDim2.new(1, -8, 1, 0)
+            argBox.Position = UDim2.new(0, 6, 0, 0)
+            argBox.BackgroundTransparency = 1
+            argBox.TextColor3 = Color3.fromRGB(210, 210, 210)
+            argBox.PlaceholderText = cmd.arg ~= "" and cmd.arg or "—"
+            argBox.PlaceholderColor3 = Color3.fromRGB(80, 80, 110)
+            argBox.Text = ""
+            argBox.TextSize = 11
+            argBox.Font = Enum.Font.Code
+            argBox.ClearTextOnFocus = false
+            argBox.TextXAlignment = Enum.TextXAlignment.Left
+
+            -- run button
+            local runBtn = Instance.new("TextButton", row)
+            runBtn.Size = UDim2.new(0, 54, 0, 26)
+            runBtn.Position = UDim2.new(1, -60, 0.5, -13)
+            runBtn.BackgroundColor3 = Color3.fromRGB(0, 140, 55)
+            runBtn.Text = "RUN"
+            runBtn.TextColor3 = Color3.new(1,1,1)
+            runBtn.TextSize = 11
+            runBtn.Font = Enum.Font.GothamMedium
+            runBtn.BorderSizePixel = 0
+            Instance.new("UICorner", runBtn).CornerRadius = UDim.new(0, 5)
+
+            runBtn.Activated:Connect(function()
+                local arg = argBox.Text:match("^%s*(.-)%s*$")
+                local full = cmd.name .. (arg ~= "" and (" " .. arg) or "")
+                FireCommand(full)
+                runBtn.BackgroundColor3 = Color3.fromRGB(0, 80, 30)
+                task.wait(0.2)
+                runBtn.BackgroundColor3 = Color3.fromRGB(0, 140, 55)
+            end)
+
+            argBox.FocusLost:Connect(function(enter)
+                if enter then
+                    local arg = argBox.Text:match("^%s*(.-)%s*$")
+                    local full = cmd.name .. (arg ~= "" and (" " .. arg) or "")
+                    FireCommand(full)
+                end
+            end)
+        end
+    end
+end
+
+-- build tab buttons
+for i, cat in ipairs(CATEGORIES) do
+    local tb = Instance.new("TextButton", tabScroll)
+    tb.Name = cat.name
+    tb.Size = UDim2.new(0, 0, 1, 0)
+    tb.AutomaticSize = Enum.AutomaticSize.X
+    tb.BackgroundColor3 = Color3.fromRGB(35, 35, 50)
+    tb.Text = cat.name
+    tb.TextColor3 = Color3.fromRGB(160, 160, 190)
+    tb.TextSize = 12
+    tb.Font = Enum.Font.GothamMedium
+    tb.BorderSizePixel = 0
+    tb.LayoutOrder = i
+    Instance.new("UICorner", tb).CornerRadius = UDim.new(0, 6)
+    local tpad = Instance.new("UIPadding", tb)
+    tpad.PaddingLeft = UDim.new(0, 10)
+    tpad.PaddingRight = UDim.new(0, 10)
+    tabBtns[cat.name] = tb
+    tb.Activated:Connect(function() showCategory(cat.name) end)
+end
+
+-- default tab
+showCategory("Spawning")
+
+-- toggle button di layar
+local toggleBtn = Instance.new("TextButton", gui)
+toggleBtn.Size = UDim2.new(0, 44, 0, 44)
+toggleBtn.Position = UDim2.new(0, 10, 0.5, -22)
+toggleBtn.BackgroundColor3 = Color3.fromRGB(0, 140, 55)
+toggleBtn.Text = "🥚"
+toggleBtn.TextSize = 20
+toggleBtn.Font = Enum.Font.GothamMedium
+toggleBtn.TextColor3 = Color3.new(1,1,1)
+toggleBtn.BorderSizePixel = 0
+Instance.new("UICorner", toggleBtn).CornerRadius = UDim.new(1, 0)
+toggleBtn.Activated:Connect(function()
+    main.Visible = not main.Visible
+end)
+
+print("[Falz] Mr. Egg's Panel replica loaded")
